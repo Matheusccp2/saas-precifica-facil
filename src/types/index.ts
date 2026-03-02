@@ -40,3 +40,14 @@ export interface SavedCalculation {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface PricingInput {
+  productName: string;
+  acquisitionCost: number;
+  shippingCost: number;
+  packagingCost: number;
+  purchaseTax: number;
+  operationalCosts: number;
+  cardFeeRate: number;   // ← novo: taxa da maquininha (%)
+  desiredMargin: number;
+}
