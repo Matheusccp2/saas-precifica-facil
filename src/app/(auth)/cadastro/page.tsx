@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import ConsentModal from "@/components/lgpd/ConsentModal";
 
 const schema = z
   .object({
@@ -34,6 +35,10 @@ type FormData = z.infer<typeof schema>;
 export default function CadastroPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showConsent, setShowConsent] = useState(false);
+  const [lgpdAccepted, setLgpdAccepted] = useState(false);
+  const [pendingData, setPendingData] = useState<FormData | null>(null);
+
   const { register: registerUser } = useAuth();
   const router = useRouter();
 
@@ -45,22 +50,23 @@ export default function CadastroPage() {
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
   const password = watch("password", "");
-  const passwordStrength = password.length >= 8
-    ? password.match(/[A-Z]/) && password.match(/[0-9]/)
-      ? "forte"
-      : "médio"
-    : password.length > 0
-    ? "fraco"
-    : "";
+  const passwordStrength =
+    password.length >= 8
+      ? password.match(/[A-Z]/) && password.match(/[0-9]/)
+        ? "forte"
+        : "médio"
+      : password.length > 0
+      ? "fraco"
+      : "";
 
-  const onSubmit = async (data: FormData) => {
+  // Chamada real ao Firebase
+  const doRegister = async (data: FormData) => {
     setLoading(true);
     try {
       await registerUser(data.email, data.password, data.displayName);
-      toast.success(
-        "Conta criada! Aguarde a ativação para acessar o sistema.",
-        { duration: 6000 }
-      );
+      toast.success("Conta criada! Aguarde a ativação para acessar.", {
+        duration: 6000,
+      });
       router.push("/aguardando-ativacao");
     } catch (error: any) {
       const msg =
@@ -73,9 +79,36 @@ export default function CadastroPage() {
     }
   };
 
+  // Ao submeter: se ainda não aceitou LGPD, abre o modal primeiro
+  const onSubmit = async (data: FormData) => {
+    if (!lgpdAccepted) {
+      setPendingData(data);
+      setShowConsent(true);
+      return;
+    }
+    await doRegister(data);
+  };
+
+  // Quando usuário aceita no modal
+  const handleConsentAccept = async () => {
+    setLgpdAccepted(true);
+    setShowConsent(false);
+    if (pendingData) {
+      await doRegister(pendingData);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center p-4">
+      {/* Modal LGPD */}
+      <ConsentModal
+        open={showConsent}
+        onAccept={handleConsentAccept}
+        onClose={() => setShowConsent(false)}
+      />
+
       <div className="w-full max-w-md">
+        {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 mb-6">
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
@@ -92,9 +125,10 @@ export default function CadastroPage() {
           </p>
         </div>
 
+        {/* Card */}
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            {/* Name */}
+            {/* Nome */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 Nome completo
@@ -132,7 +166,7 @@ export default function CadastroPage() {
               )}
             </div>
 
-            {/* Password */}
+            {/* Senha */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 Senha
@@ -149,9 +183,15 @@ export default function CadastroPage() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
                 </button>
               </div>
+
+              {/* Força da senha */}
               {passwordStrength && (
                 <div className="mt-1.5 flex items-center gap-2">
                   <div className="flex gap-1 flex-1">
@@ -170,14 +210,20 @@ export default function CadastroPage() {
                       />
                     ))}
                   </div>
-                  <span className={`text-xs font-medium ${
-                    passwordStrength === "forte" ? "text-green-600" :
-                    passwordStrength === "médio" ? "text-yellow-600" : "text-red-500"
-                  }`}>
+                  <span
+                    className={`text-xs font-medium ${
+                      passwordStrength === "forte"
+                        ? "text-green-600"
+                        : passwordStrength === "médio"
+                        ? "text-yellow-600"
+                        : "text-red-500"
+                    }`}
+                  >
                     {passwordStrength}
                   </span>
                 </div>
               )}
+
               {errors.password && (
                 <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1">
                   <AlertCircle className="w-3.5 h-3.5" />
@@ -186,7 +232,7 @@ export default function CadastroPage() {
               )}
             </div>
 
-            {/* Confirm Password */}
+            {/* Confirmar senha */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 Confirmar senha
@@ -218,13 +264,16 @@ export default function CadastroPage() {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Já tem uma conta?{" "}
-              <Link href="/login" className="text-blue-600 font-semibold hover:underline">
+              <Link
+                href="/login"
+                className="text-blue-600 font-semibold hover:underline"
+              >
                 Fazer login
               </Link>
             </p>
           </div>
 
-          {/* Benefits */}
+          {/* Benefícios */}
           <div className="mt-6 pt-6 border-t border-gray-100">
             <p className="text-xs text-gray-500 text-center mb-3">
               Ao criar sua conta você terá acesso a:
@@ -243,6 +292,17 @@ export default function CadastroPage() {
             </div>
           </div>
         </div>
+
+        <p className="text-center text-xs text-gray-400 mt-6">
+          Ao criar sua conta, você concordará com nossos{" "}
+          <a href="#" className="underline">
+            Termos de Uso
+          </a>{" "}
+          e{" "}
+          <a href="#" className="underline">
+            Política de Privacidade
+          </a>
+        </p>
       </div>
     </div>
   );
