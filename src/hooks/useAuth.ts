@@ -9,6 +9,9 @@ import {
   signOut,
   updateProfile,
   sendPasswordResetEmail,
+  deleteUser,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
 } from "firebase/auth";
 import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
@@ -39,11 +42,10 @@ export function useAuth() {
   const register = async (
     email: string,
     password: string,
-    displayName: string,
+    displayName: string
   ) => {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(cred.user, { displayName });
-    // Salva o usuário no Firestore com isActive: false (aguarda ativação manual/webhook)
     await setDoc(doc(db, "users", cred.user.uid), {
       uid: cred.user.uid,
       email,
@@ -59,6 +61,18 @@ export function useAuth() {
   const logout = () => signOut(auth);
 
   const resetPassword = (email: string) => sendPasswordResetEmail(auth, email);
+
+  // ── Reautentica e deleta conta completamente ──
+  const deleteAccount = async (password: string): Promise<void> => {
+    if (!user || !user.email) throw new Error("Usuário não autenticado.");
+
+    // Reautentica para garantir sessão recente
+    const credential = EmailAuthProvider.credential(user.email, password);
+    await reauthenticateWithCredential(user, credential);
+
+    // Deleta do Authentication
+    await deleteUser(user);
+  };
 
   return {
     user,

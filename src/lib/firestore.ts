@@ -188,19 +188,32 @@ export async function exportUserData(userId: string) {
 }
 
 export async function deleteAllUserData(userId: string): Promise<void> {
-  const batch = writeBatch(db);
-
-  // Marcar user para exclusão (soft delete)
-  batch.update(doc(db, "users", userId), {
-    deletionRequestedAt: serverTimestamp(),
-    isActive: false,
-  });
-
-  // Deletar todos os cálculos
+  // Busca todos os cálculos do usuário
   const calcsSnapshot = await getDocs(
     query(collection(db, "calculations"), where("userId", "==", userId))
   );
+
+  // Usa batch para deletar tudo de uma vez
+  const batch = writeBatch(db);
+
+  // Deleta cada cálculo
   calcsSnapshot.docs.forEach((d) => batch.delete(d.ref));
 
+  // Deleta o documento do usuário (hard delete)
+  batch.delete(doc(db, "users", userId));
+
   await batch.commit();
+}
+
+export async function updateCalculation(
+  calcId: string,
+  input: PricingInput,
+  result: PricingResult
+): Promise<void> {
+  await updateDoc(doc(db, "calculations", calcId), {
+    productName: input.productName,
+    input,
+    result,
+    updatedAt: serverTimestamp(),
+  });
 }

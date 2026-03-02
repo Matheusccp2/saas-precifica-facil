@@ -6,6 +6,7 @@ import {
   saveCalculation,
   getUserCalculations,
   deleteCalculation,
+  updateCalculation,
 } from "@/lib/firestore";
 import { PricingInput, PricingResult, SavedCalculation } from "@/types";
 import { toast } from "sonner";
@@ -64,11 +65,31 @@ export function useCalculations() {
     }
   };
 
+  const update = async (
+    calcId: string,
+    input: PricingInput,
+    result: PricingResult,
+  ) => {
+    try {
+      await updateCalculation(calcId, input, result);
+      setCalculations((prev) =>
+        prev.map((c) =>
+          c.id === calcId ? { ...c, input, result, updatedAt: new Date() } : c,
+        ),
+      );
+      toast.success("Cálculo atualizado!");
+    } catch (err) {
+      console.error("Erro ao atualizar:", err);
+      toast.error("Erro ao atualizar cálculo.");
+    }
+  };
+
   return {
     calculations,
     loading: loading || authLoading,
     save,
     remove,
+    update,
     refetch: fetchCalculations,
   };
 }
