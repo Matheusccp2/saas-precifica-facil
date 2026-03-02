@@ -9,7 +9,8 @@ import {
   BarChart3,
   Settings,
   LogOut,
-  ChevronRight,
+  ChevronRight, 
+  TrendingUp
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -19,6 +20,7 @@ const navItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/calculadora", icon: Calculator, label: "Calculadora" },
   { href: "/historico", icon: History, label: "Histórico" },
+  { href: "/curva-abc", icon: TrendingUp, label: "Curva ABC" },
   { href: "/relatorios", icon: BarChart3, label: "Relatórios" },
   { href: "/configuracoes", icon: Settings, label: "Configurações" },
 ];
@@ -61,12 +63,21 @@ export default function Sidebar() {
                 "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group",
                 isActive
                   ? "bg-blue-50 text-blue-700"
-                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
               )}
             >
-              <item.icon className={cn("w-5 h-5", isActive ? "text-blue-600" : "text-gray-400 group-hover:text-gray-600")} />
+              <item.icon
+                className={cn(
+                  "w-5 h-5",
+                  isActive
+                    ? "text-blue-600"
+                    : "text-gray-400 group-hover:text-gray-600",
+                )}
+              />
               {item.label}
-              {isActive && <ChevronRight className="w-4 h-4 ml-auto text-blue-400" />}
+              {isActive && (
+                <ChevronRight className="w-4 h-4 ml-auto text-blue-400" />
+              )}
             </Link>
           );
         })}

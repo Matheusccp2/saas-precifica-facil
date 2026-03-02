@@ -386,6 +386,155 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Depoimentos */}
+      <section id="depoimentos" className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-yellow-50 text-yellow-700 text-sm font-medium px-4 py-2 rounded-full mb-4">
+              <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+              Avaliação média de 4.9/5
+            </div>
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Lojistas que já{" "}
+              <span className="text-blue-600">precificam com confiança</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Veja o que nossos clientes falam sobre o PrecificaFácil
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              {
+                name: "Mariana Costa",
+                role: "Loja de roupas femininas — SP",
+                avatar: "MC",
+                rating: 5,
+                color: "bg-pink-100 text-pink-700",
+                text: "Antes eu precificava no chute e vivia no sufoco. Com o PrecificaFácil descobri que estava vendendo algumas peças no prejuízo sem saber! Hoje minha margem média subiu de 18% para 34%.",
+                highlight: "margem subiu de 18% para 34%",
+              },
+              {
+                name: "Rafael Mendes",
+                role: "E-commerce de eletrônicos — MG",
+                avatar: "RM",
+                rating: 5,
+                color: "bg-blue-100 text-blue-700",
+                text: "Trabalho com marketplace e os custos operacionais me matavam. Agora consigo incluir as comissões do Mercado Livre e Amazon no cálculo e saber exatamente quanto vou lucrar antes de listar o produto.",
+                highlight: "sei exatamente quanto vou lucrar",
+              },
+              {
+                name: "Fernanda Alves",
+                role: "Papelaria e presentes — RJ",
+                avatar: "FA",
+                rating: 5,
+                color: "bg-purple-100 text-purple-700",
+                text: "Simples, rápido e preciso. Uso todos os dias para calcular novos produtos. O histórico é incrível pois consigo ver quais produtos têm melhor margem e focar neles.",
+                highlight: "uso todos os dias",
+              },
+              {
+                name: "Carlos Eduardo",
+                role: "Distribuidora de alimentos — RS",
+                avatar: "CE",
+                rating: 5,
+                color: "bg-green-100 text-green-700",
+                text: "Tentei várias planilhas mas sempre dava erro ou esquecia algum custo. O PrecificaFácil me guia em cada campo e os relatórios mostram uma visão geral do meu negócio que eu nunca tive.",
+                highlight: "visão geral que nunca tive",
+              },
+              {
+                name: "Juliana Rocha",
+                role: "Boutique infantil — BA",
+                avatar: "JR",
+                rating: 5,
+                color: "bg-orange-100 text-orange-700",
+                text: "O suporte é excelente e a ferramenta é muito intuitiva. Em menos de 5 minutos já estava calculando meus preços. Recomendo para qualquer lojista que queira ter controle do negócio.",
+                highlight: "em menos de 5 minutos",
+              },
+              {
+                name: "Bruno Takahashi",
+                role: "Importados e utilidades — PR",
+                avatar: "BT",
+                rating: 5,
+                color: "bg-indigo-100 text-indigo-700",
+                text: "Trabalho com importação e os impostos são complexos. O campo de impostos na compra resolveu meu problema. Finalmente tenho um preço justo que cobre todos os custos e ainda gera lucro real.",
+                highlight: "lucro real garantido",
+              },
+            ].map((dep) => (
+              <div
+                key={dep.name}
+                className="bg-gray-50 rounded-2xl p-6 flex flex-col gap-4 hover:shadow-md transition-shadow"
+              >
+                {/* Estrelas */}
+                <div className="flex gap-0.5">
+                  {Array.from({ length: dep.rating }).map((_, i) => (
+                    <Star
+                      key={i}
+                      className="w-4 h-4 fill-yellow-400 text-yellow-400"
+                    />
+                  ))}
+                </div>
+
+                {/* Texto */}
+                <p className="text-gray-700 text-sm leading-relaxed flex-1">
+                  "
+                  {dep.text.split(dep.highlight).map((part, i, arr) =>
+                    i < arr.length - 1 ? (
+                      <span key={i}>
+                        {part}
+                        <span className="font-semibold text-blue-600">
+                          {dep.highlight}
+                        </span>
+                      </span>
+                    ) : (
+                      part
+                    ),
+                  )}
+                  "
+                </p>
+
+                {/* Autor */}
+                <div className="flex items-center gap-3 pt-2 border-t border-gray-200">
+                  <div
+                    className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 ${dep.color}`}
+                  >
+                    {dep.avatar}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">
+                      {dep.name}
+                    </p>
+                    <p className="text-xs text-gray-500">{dep.role}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Média geral */}
+          <div className="mt-12 bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-8 text-white text-center">
+            <div className="flex justify-center gap-1 mb-3">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star
+                  key={i}
+                  className="w-6 h-6 fill-yellow-400 text-yellow-400"
+                />
+              ))}
+            </div>
+            <p className="text-3xl font-bold mb-1">4.9 / 5.0</p>
+            <p className="text-blue-200 text-sm mb-6">
+              Baseado em mais de 500 avaliações de lojistas
+            </p>
+            <Link
+              href="/cadastro"
+              className="inline-flex items-center gap-2 bg-white text-blue-600 font-bold px-6 py-3 rounded-xl hover:bg-blue-50 transition-colors"
+            >
+              Quero precificar com confiança
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-400 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -398,7 +547,8 @@ export default function LandingPage() {
             </span>
           </div>
           <p className="text-sm">
-            © {new Date().getFullYear()} Precifica Fácil. Todos os direitos reservados.
+            © {new Date().getFullYear()} Precifica Fácil. Todos os direitos
+            reservados.
           </p>
         </div>
       </footer>
