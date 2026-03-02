@@ -39,7 +39,7 @@ export function useAuth() {
   const register = async (
     email: string,
     password: string,
-    displayName: string
+    displayName: string,
   ) => {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(cred.user, { displayName });
@@ -60,5 +60,13 @@ export function useAuth() {
 
   const resetPassword = (email: string) => sendPasswordResetEmail(auth, email);
 
-  return { user, loading, isActive, login, register, logout, resetPassword };
+  return {
+    user,
+    loading,
+    isActive,
+    login,
+    register,
+    logout,
+    resetPassword,
+  };
 }

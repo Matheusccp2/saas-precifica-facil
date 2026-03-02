@@ -1,0 +1,21 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "calculations",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "calculations",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "result.realNetMargin", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
