@@ -9,8 +9,9 @@ import {
   BarChart3,
   Settings,
   LogOut,
-  ChevronRight, 
-  TrendingUp
+  ChevronRight,
+  TrendingUp,
+  MessageCircle,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -24,6 +25,12 @@ const navItems = [
   { href: "/relatorios", icon: BarChart3, label: "Relatórios" },
   { href: "/configuracoes", icon: Settings, label: "Configurações" },
 ];
+
+const WHATSAPP_NUMBER = "5511999999999"; // ← substitua pelo seu número
+const WHATSAPP_MESSAGE = encodeURIComponent(
+  "Olá! Preciso de suporte técnico no PrecificaFácil.",
+);
+const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`;
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -82,6 +89,19 @@ export default function Sidebar() {
           );
         })}
       </nav>
+
+      {/* Suporte WhatsApp */}
+      <div className="px-4 pb-2">
+        <a
+          href={WHATSAPP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-3 px-3 py-2.5 w-full rounded-xl text-sm font-medium bg-green-50 text-green-700 hover:bg-green-100 transition-all border"
+        >
+          <MessageCircle className="w-5 h-5 text-green-600" />
+          Suporte via WhatsApp
+        </a>
+      </div>
 
       {/* User */}
       <div className="p-4 border-t border-gray-100">
