@@ -21,9 +21,6 @@ import {
 import { db } from "./firebase";
 import { PricingInput, PricingResult, SavedCalculation } from "@/types";
 
-// ─────────────────────────────────────────────
-// CALCULATIONS
-// ─────────────────────────────────────────────
 
 export async function saveCalculation(
   userId: string,
@@ -64,9 +61,6 @@ export async function deleteCalculation(calcId: string): Promise<void> {
   await deleteDoc(doc(db, "calculations", calcId));
 }
 
-// ─────────────────────────────────────────────
-// REPORTS — agregações reais
-// ─────────────────────────────────────────────
 
 export async function getReportData(userId: string) {
   const q = query(
@@ -95,25 +89,20 @@ export async function getReportData(userId: string) {
     };
   }
 
-  // Margem média
   const avgMargin =
     docs.reduce((acc, d) => acc + d.result.realNetMargin, 0) / docs.length;
 
-  // Markup médio
   const avgMarkup =
     docs.reduce((acc, d) => acc + d.result.markup, 0) / docs.length;
 
-  // Produto de maior margem
   const topProduct = docs.reduce((prev, curr) =>
     curr.result.realNetMargin > prev.result.realNetMargin ? curr : prev
   );
 
-  // Produto de menor margem
   const lowestMarginProduct = docs.reduce((prev, curr) =>
     curr.result.realNetMargin < prev.result.realNetMargin ? curr : prev
   );
 
-  // Distribuição por faixa de margem
   const marginDistribution = [
     { range: "0–15%", count: docs.filter((d) => d.result.realNetMargin < 15).length },
     { range: "15–25%", count: docs.filter((d) => d.result.realNetMargin >= 15 && d.result.realNetMargin < 25).length },
@@ -121,7 +110,6 @@ export async function getReportData(userId: string) {
     { range: "35%+", count: docs.filter((d) => d.result.realNetMargin >= 35).length },
   ];
 
-  // Evolução mensal (últimos 6 meses)
   const now = new Date();
   const evolutionData = Array.from({ length: 6 }, (_, i) => {
     const date = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
@@ -147,7 +135,6 @@ export async function getReportData(userId: string) {
     };
   });
 
-  // Top 5 produtos por maior margem
   const topProducts = [...docs]
     .sort((a, b) => b.result.realNetMargin - a.result.realNetMargin)
     .slice(0, 5);
@@ -164,9 +151,6 @@ export async function getReportData(userId: string) {
   };
 }
 
-// ─────────────────────────────────────────────
-// LGPD — Exportar e Excluir dados do usuário
-// ─────────────────────────────────────────────
 
 export async function exportUserData(userId: string) {
   const userDoc = await getDoc(doc(db, "users", userId));
@@ -188,18 +172,14 @@ export async function exportUserData(userId: string) {
 }
 
 export async function deleteAllUserData(userId: string): Promise<void> {
-  // Busca todos os cálculos do usuário
   const calcsSnapshot = await getDocs(
     query(collection(db, "calculations"), where("userId", "==", userId))
   );
 
-  // Usa batch para deletar tudo de uma vez
   const batch = writeBatch(db);
 
-  // Deleta cada cálculo
   calcsSnapshot.docs.forEach((d) => batch.delete(d.ref));
 
-  // Deleta o documento do usuário (hard delete)
   batch.delete(doc(db, "users", userId));
 
   await batch.commit();
