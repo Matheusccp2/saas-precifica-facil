@@ -479,7 +479,7 @@ export default function LandingPage() {
             </span>
           </div>
           <p className="text-sm">
-            © 2024 PrecificaFácil. Todos os direitos reservados.
+            © {new Date().getFullYear()} PrecificaFácil. Todos os direitos reservados.
           </p>
         </div>
       </footer>

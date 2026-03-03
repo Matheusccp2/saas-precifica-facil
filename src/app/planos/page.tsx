@@ -10,8 +10,8 @@ import {
 } from "lucide-react";
 
 export default function PlanosPage() {
-  // Substitua pela URL do seu link de pagamento (Hotmart, Kiwify, Stripe, etc.)
-  const PAYMENT_URL = "https://seulink.com/pagamento";
+  
+  const PAYMENT_URL = "/";
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
@@ -217,8 +217,8 @@ export default function PlanosPage() {
                 a: "Após a confirmação do pagamento, você receberá um e-mail com as instruções de acesso em até 24 horas úteis.",
               },
               {
-                q: "Posso cancelar a qualquer momento?",
-                a: "Sim. Você pode solicitar o cancelamento a qualquer momento pelo suporte via WhatsApp. O acesso permanece ativo até o fim do período pago.",
+                q: "Como funciona o cancelamento?",
+                a: "Você possui o prazo de 7 dias úteis para solicitar o cancelamento pelo suporte via WhatsApp após a compra.",
               },
               {
                 q: "Funciona no celular?",
