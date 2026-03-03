@@ -12,6 +12,7 @@ import {
   ChevronRight,
   TrendingUp,
   MessageCircle,
+  X,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -32,7 +33,12 @@ const WHATSAPP_MESSAGE = encodeURIComponent(
 );
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`;
 
-export default function Sidebar() {
+interface SidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
@@ -44,19 +50,37 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-100 flex flex-col h-screen sticky top-0">
-      {/* Logo */}
-      <div className="p-6 border-b border-gray-100">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <Calculator className="w-5 h-5 text-white" />
-          </div>
-          <span className="text-lg font-bold">
-            <span className="text-gray-900">Precifica</span>
-            <span className="text-blue-600">Fácil</span>
-          </span>
-        </Link>
-      </div>
+    <>
+      {/* Mobile Overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={onClose}
+        />
+      )}
+      
+      {/* Sidebar */}
+      <aside 
+        className={cn(
+          "fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-100 flex flex-col h-[100dvh] transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 lg:h-screen lg:sticky lg:top-0",
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        {/* Logo */}
+        <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+          <Link href="/dashboard" className="flex items-center gap-2" onClick={() => onClose()}>
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <Calculator className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-lg font-bold">
+              <span className="text-gray-900">Precifica</span>
+              <span className="text-blue-600">Fácil</span>
+            </span>
+          </Link>
+          <button onClick={onClose} className="lg:hidden text-gray-400 hover:text-gray-600">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
 
       {/* Nav */}
       <nav className="flex-1 p-4 space-y-1">
@@ -66,6 +90,7 @@ export default function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={() => onClose()}
               className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group",
                 isActive
@@ -127,5 +152,6 @@ export default function Sidebar() {
         </button>
       </div>
     </aside>
+    </>
   );
 }

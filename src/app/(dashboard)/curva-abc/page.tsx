@@ -324,7 +324,7 @@ export default function CurvaABCPage() {
   }
 
   return (
-    <div className="p-8 space-y-8">
+    <div className="p-4 md:p-8 space-y-8">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
@@ -472,8 +472,8 @@ export default function CurvaABCPage() {
       </div>
 
       {/* Tabela */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <table className="w-full">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-x-auto">
+        <table className="w-full min-w-[800px]">
           <thead>
             <tr className="border-b border-gray-100 bg-gray-50">
               <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider w-12">

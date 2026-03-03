@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import {
   BarChart3,
@@ -10,9 +11,13 @@ import {
   ArrowRight,
   Star,
   Lock,
+  Menu,
+  X,
 } from "lucide-react";
 
 export default function LandingPage() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-white">
       {/* Navbar */}
@@ -48,7 +53,7 @@ export default function LandingPage() {
                 Depoimentos
               </a>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="hidden md:flex items-center gap-3">
               <Link
                 href="/login"
                 className="text-gray-700 hover:text-blue-600 text-sm font-medium px-4 py-2 rounded-lg border border-gray-200 hover:border-blue-200 transition-all"
@@ -62,12 +67,70 @@ export default function LandingPage() {
                 Adquirir Plano
               </Link>
             </div>
+            {/* Mobile menu button */}
+            <div className="md:hidden flex items-center">
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="text-gray-600 hover:text-gray-900 p-2"
+              >
+                {isMobileMenuOpen ? (
+                  <X className="w-6 h-6" />
+                ) : (
+                  <Menu className="w-6 h-6" />
+                )}
+              </button>
+            </div>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden border-t border-gray-100 bg-white">
+            <div className="px-4 pt-2 pb-6 space-y-2">
+              <a
+                href="#funcionalidades"
+                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Funcionalidades
+              </a>
+              <a
+                href="#planos"
+                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Planos
+              </a>
+              <a
+                href="#depoimentos"
+                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Depoimentos
+              </a>
+              <div className="pt-4 flex flex-col gap-3">
+                <Link
+                  href="/login"
+                  className="w-full text-center text-gray-700 hover:text-blue-600 text-base font-medium px-4 py-3 rounded-xl border border-gray-200"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Entrar
+                </Link>
+                <Link
+                  href="/planos"
+                  className="w-full text-center bg-blue-600 text-white text-base font-medium px-4 py-3 rounded-xl"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Adquirir Plano
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-blue-50 via-white to-blue-50 py-20 lg:py-28">
+      <section className="bg-gradient-to-br from-blue-50 via-white to-blue-50 py-12 md:py-20 lg:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 text-sm font-medium px-4 py-2 rounded-full mb-6">
@@ -197,7 +260,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features */}
-      <section id="funcionalidades" className="py-20 bg-white">
+      <section id="funcionalidades" className="py-16 md:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
@@ -276,7 +339,7 @@ export default function LandingPage() {
       </section>
 
       {/* Planos */}
-      <section id="planos" className="py-20 bg-gray-50">
+      <section id="planos" className="py-16 md:py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
@@ -334,7 +397,7 @@ export default function LandingPage() {
       </section>
 
       {/* Depoimentos */}
-      <section id="depoimentos" className="py-20 bg-white">
+      <section id="depoimentos" className="py-16 md:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 bg-yellow-50 text-yellow-700 text-sm font-medium px-4 py-2 rounded-full mb-4">

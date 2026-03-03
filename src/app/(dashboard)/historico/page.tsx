@@ -19,10 +19,10 @@ import Link from "next/link";
 // Cálculo de preço (mesma lógica da calculadora)
 // ─────────────────────────────────────────────
 function calculatePrice(input: PricingInput): PricingResult {
-  const { acquisitionCost, shippingCost, packagingCost, purchaseTax, operationalCosts, desiredMargin } = input;
+  const { acquisitionCost, shippingCost, packagingCost, purchaseTax, operationalCosts, cardFeeRate, desiredMargin } = input;
   const taxAmount = (acquisitionCost * purchaseTax) / 100;
   const productCost = acquisitionCost + shippingCost + packagingCost + taxAmount;
-  const markup = 1 / (1 - (desiredMargin + operationalCosts) / 100);
+  const markup = 1 / (1 - (desiredMargin + operationalCosts + cardFeeRate) / 100);
   const suggestedPrice = productCost * markup;
   const variableExpenses = (suggestedPrice * operationalCosts) / 100;
   const saleTaxPercent = 11;
@@ -54,6 +54,7 @@ const editSchema = z.object({
   packagingCost: z.coerce.number().min(0),
   purchaseTax: z.coerce.number().min(0).max(100),
   operationalCosts: z.coerce.number().min(0).max(100),
+  cardFeeRate: z.coerce.number().min(0).max(100),
   desiredMargin: z.coerce.number().min(1).max(99),
 });
 type EditFormData = z.infer<typeof editSchema>;
@@ -80,6 +81,7 @@ function EditModal({
       packagingCost: calc.input.packagingCost,
       purchaseTax: calc.input.purchaseTax,
       operationalCosts: calc.input.operationalCosts,
+      cardFeeRate: calc.input.cardFeeRate || 0,
       desiredMargin: calc.input.desiredMargin,
     },
   });
@@ -169,7 +171,10 @@ function EditModal({
             <Field label="Impostos na Compra (%)" name="purchaseTax" suffix="%" />
             <Field label="Custos Operacionais (%)" name="operationalCosts" suffix="%" />
           </div>
-          <Field label="Margem de Lucro Desejada (%)" name="desiredMargin" suffix="%" />
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Margem Desejada (%)" name="desiredMargin" suffix="%" />
+            <Field label="Taxa da Maquininha (%)" name="cardFeeRate" suffix="%" />
+          </div>
 
           {/* Aviso */}
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-start gap-2">
@@ -346,7 +351,7 @@ export default function HistoricoPage() {
   };
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       {/* Modais */}
       {viewing && (
         <CalcDetailModal calc={viewing} onClose={() => setViewing(null)} />
@@ -403,8 +408,8 @@ export default function HistoricoPage() {
           )}
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <table className="w-full">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-x-auto">
+          <table className="w-full min-w-[800px]">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50">
                 {["Produto", "Custo", "Preço Sugerido", "Margem Líquida", "Data"].map((h) => (
