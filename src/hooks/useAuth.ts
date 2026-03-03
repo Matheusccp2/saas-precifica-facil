@@ -12,6 +12,7 @@ import {
   deleteUser,
   EmailAuthProvider,
   reauthenticateWithCredential,
+  sendEmailVerification,
 } from "firebase/auth";
 import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
@@ -55,6 +56,15 @@ export function useAuth() {
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
+
+    // Envia e-mail de verificação protegendo contra erros de disparo
+    try {
+      await sendEmailVerification(cred.user);
+    } catch (err) {
+      console.error("Erro ao enviar email de verificação:", err);
+      // Opcional: Aqui nós só fazemos log. O usuário já foi criado.
+    }
+
     return cred;
   };
 

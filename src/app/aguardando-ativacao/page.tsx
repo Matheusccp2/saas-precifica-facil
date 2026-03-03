@@ -29,8 +29,8 @@ export default function AguardandoAtivacaoPage() {
 
           <div className="space-y-3 text-left mb-6">
             {[
-              { icon: Mail, text: "Verifique seu e-mail para confirmações" },
-              { icon: Clock, text: "Ativação em até 24 horas úteis" },
+              { icon: Mail, text: "Verifique seu e-mail e clique no link de confirmação do Firebase" },
+              { icon: Clock, text: "Ativação administrativa em até 24 horas úteis" },
               { icon: CheckCircle, text: "Acesso liberado após confirmação de pagamento" },
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-3">

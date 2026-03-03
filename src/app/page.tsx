@@ -13,6 +13,7 @@ import {
   Lock,
   Menu,
   X,
+  MessageCircle,
 } from "lucide-react";
 
 export default function LandingPage() {
@@ -169,6 +170,18 @@ export default function LandingPage() {
               >
                 Já sou assinante
               </Link>
+            </div>
+            
+            <div className="mt-6 flex justify-center">
+              <a
+                href="https://wa.me/5511999999999?text=Olá,%20gostaria%20de%20mais%20informações%20sobre%20o%20PrecificaFácil!"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 text-green-600 font-semibold hover:text-green-700 transition-colors bg-green-50 px-6 py-3 rounded-full border border-green-200 hover:bg-green-100"
+              >
+                <MessageCircle className="w-5 h-5" />
+                Dúvidas? Fale com a gente no WhatsApp
+              </a>
             </div>
           </div>
 

@@ -64,7 +64,7 @@ export default function CadastroPage() {
     setLoading(true);
     try {
       await registerUser(data.email, data.password, data.displayName);
-      toast.success("Conta criada! Aguarde a ativação para acessar.", {
+      toast.success("Conta criada! Verifique seu e-mail para confirmar e clique no link.", {
         duration: 6000,
       });
       router.push("/aguardando-ativacao");
