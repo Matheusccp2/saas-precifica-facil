@@ -31,9 +31,6 @@ import {
 import Link from "next/link";
 import { SavedCalculation } from "@/types";
 
-// ─────────────────────────────────────────────
-// Tipos
-// ─────────────────────────────────────────────
 type ABCClass = "A" | "B" | "C";
 
 interface ABCProduct {
@@ -44,9 +41,6 @@ interface ABCProduct {
   class: ABCClass;
 }
 
-// ─────────────────────────────────────────────
-// Lógica da Curva ABC
-// ─────────────────────────────────────────────
 function buildABC(calculations: SavedCalculation[]): ABCProduct[] {
   if (calculations.length === 0) return [];
 
@@ -87,9 +81,6 @@ function buildABC(calculations: SavedCalculation[]): ABCProduct[] {
   });
 }
 
-// ─────────────────────────────────────────────
-// Configs visuais por classe
-// ─────────────────────────────────────────────
 const classConfig = {
   A: {
     label: "Classe A",
