@@ -13,6 +13,7 @@ export const pricingSchema = z.object({
   operationalCosts: z.coerce.number().min(0).max(100),
   cardFeeRate: z.coerce.number().min(0).max(100),
   desiredMargin: z.coerce.number().min(1).max(99),
+  marketplaceCosts: z.coerce.number().min(0).max(100),
 });
 
 export type PricingFormData = z.infer<typeof pricingSchema>;
@@ -135,12 +136,21 @@ export function PricingForm({ form, onSubmit }: PricingFormProps) {
           tooltip="Taxa cobrada pela operadora do cartão (débito/crédito/PIX)"
         />
       </div>
-      <Field
-        label="Custos Operacionais (%)"
-        name="operationalCosts"
-        suffix="%"
-        tooltip="Comissões, marketplace"
-      />
+      <div className="grid grid-cols-2 gap-3">
+        <Field
+          label="Custos Operacionais (%)"
+          name="operationalCosts"
+          suffix="%"
+          tooltip="Comissões, marketplace"
+        />
+        <Field
+          label="Custos Marketplace (R$)"
+          name="marketplaceCosts"
+          suffix="R$"
+          tooltip="Comissões, marketplace"
+        />
+
+      </div>
       <Field
         label="Margem de Lucro Desejada (%)"
         name="desiredMargin"

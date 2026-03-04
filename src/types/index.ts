@@ -50,4 +50,5 @@ export interface PricingInput {
   operationalCosts: number;
   cardFeeRate: number;   // ← novo: taxa da maquininha (%)
   desiredMargin: number;
+  marketplaceCosts: number;
 }

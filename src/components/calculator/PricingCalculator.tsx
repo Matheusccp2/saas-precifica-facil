@@ -30,8 +30,9 @@ export default function PricingCalculator() {
       packagingCost: 0,
       purchaseTax: 0,
       operationalCosts: 15,
-      cardFeeRate: 2.99,
+      cardFeeRate: 7,
       desiredMargin: 40,
+      marketplaceCosts: 0,
     },
   });
 
