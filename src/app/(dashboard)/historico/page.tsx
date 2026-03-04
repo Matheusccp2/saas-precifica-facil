@@ -29,6 +29,7 @@ function calculatePrice(input: PricingInput): PricingResult {
   const saleTax = (suggestedPrice * saleTaxPercent) / 100;
   const grossProfit = suggestedPrice - productCost - variableExpenses;
   const realNetMargin = ((grossProfit - saleTax) / suggestedPrice) * 100;
+
   return {
     suggestedPrice,
     productCost,
@@ -56,6 +57,7 @@ const editSchema = z.object({
   operationalCosts: z.coerce.number().min(0).max(100),
   cardFeeRate: z.coerce.number().min(0).max(100),
   desiredMargin: z.coerce.number().min(1).max(99),
+  marketplaceCosts: z.coerce.number().min(0),
 });
 type EditFormData = z.infer<typeof editSchema>;
 
@@ -83,6 +85,7 @@ function EditModal({
       operationalCosts: calc.input.operationalCosts,
       cardFeeRate: calc.input.cardFeeRate || 0,
       desiredMargin: calc.input.desiredMargin,
+      marketplaceCosts: calc.input.marketplaceCosts || 0,
     },
   });
 

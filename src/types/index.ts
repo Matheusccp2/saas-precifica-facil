@@ -16,6 +16,8 @@ export interface PricingInput {
   purchaseTax: number;
   operationalCosts: number;
   desiredMargin: number;
+  cardFeeRate: number;
+  marketplaceCosts: number;
 }
 
 export interface PricingResult {
