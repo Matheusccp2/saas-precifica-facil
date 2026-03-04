@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
             title: "PrecificaFácil — Plano Anual",
             description: "Acesso completo à calculadora de precificação por 1 ano",
             quantity: 1,
-            unit_price: 0.01,
+            unit_price: 9.90,
             currency_id: "BRL",
           },
         ],
