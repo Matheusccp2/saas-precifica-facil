@@ -1,17 +1,53 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  Calculator,
-  CheckCircle,
-  ArrowRight,
-  Shield,
-  Star,
-  MessageCircle,
-  Lock,
+  Calculator, CheckCircle, ArrowRight,
+  Shield, Star, MessageCircle, Lock, Loader2,
 } from "lucide-react";
 
 export default function PlanosPage() {
-  
-  const PAYMENT_URL = "/";
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [error, setError] = useState("");
+  const router = useRouter();
+
+  const handleCheckout = async () => {
+    if (!email || !name) {
+      setError("Preencha seu nome e e-mail para continuar.");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError("Digite um e-mail válido.");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const res = await fetch("/api/create-preference", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, name }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.init_point) {
+        throw new Error(data.error || "Erro ao criar pagamento.");
+      }
+
+      // Redireciona para o checkout do Mercado Pago
+      window.location.href = data.init_point;
+    } catch (err: any) {
+      setError(err.message || "Erro inesperado. Tente novamente.");
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
@@ -28,10 +64,7 @@ export default function PlanosPage() {
                 <span className="text-blue-600">Fácil</span>
               </span>
             </Link>
-            <Link
-              href="/login"
-              className="text-gray-600 hover:text-blue-600 text-sm font-medium transition-colors"
-            >
+            <Link href="/login" className="text-gray-600 hover:text-blue-600 text-sm font-medium transition-colors">
               Já sou assinante → Entrar
             </Link>
           </div>
@@ -50,14 +83,12 @@ export default function PlanosPage() {
             <span className="text-blue-600">menos de R$ 1/mês</span>
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Um único plano com tudo que você precisa para precificar seus
-            produtos com inteligência e nunca mais vender no prejuízo.
+            Um único plano com tudo que você precisa para precificar
+            com inteligência e nunca mais vender no prejuízo.
           </p>
         </div>
 
-        {/* Card do plano */}
         <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden mb-8">
-          {/* Banner topo */}
           <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-4 text-center">
             <p className="text-white font-bold text-sm tracking-widest uppercase">
               ✦ Plano Anual — Acesso Total ✦
@@ -65,81 +96,97 @@ export default function PlanosPage() {
           </div>
 
           <div className="p-8 lg:p-10">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
-              {/* Preço */}
-              <div className="text-center lg:text-left">
-                <div className="flex items-end justify-center lg:justify-start gap-2 mb-2">
-                  <span className="text-6xl font-black text-gray-900">R$9,90</span>
-                  <span className="text-gray-500 text-lg mb-2">/ano</span>
-                </div>
-                <p className="text-green-600 font-semibold text-sm">
-                  ✓ Equivale a R$ 0,82 por mês
-                </p>
-                <p className="text-gray-400 text-xs mt-1">
-                  Cobrado uma vez por ano. Cancele quando quiser.
+            {/* Preço */}
+            <div className="text-center mb-8">
+              <div className="flex items-end justify-center gap-2 mb-2">
+                <span className="text-6xl font-black text-gray-900">R$9,90</span>
+                <span className="text-gray-500 text-lg mb-2">/ano</span>
+              </div>
+              <p className="text-green-600 font-semibold text-sm">
+                ✓ Equivale a R$ 0,82 por mês
+              </p>
+              <p className="text-gray-400 text-xs mt-1">
+                Cobrado uma vez por ano.
+              </p>
+            </div>
+
+            {/* Formulário de dados */}
+            <div className="max-w-md mx-auto mb-8 space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Seu nome completo
+                </label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => { setName(e.target.value); setError(""); }}
+                  placeholder="João da Silva"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Seu melhor e-mail
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => { setEmail(e.target.value); setError(""); }}
+                  placeholder="seu@email.com"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  Use o mesmo e-mail que usará para criar sua conta.
                 </p>
               </div>
 
-              {/* CTA */}
-              <div className="flex flex-col items-center lg:items-end gap-3">
-                <a
-                  href={PAYMENT_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 bg-blue-600 text-white font-bold px-8 py-4 rounded-2xl hover:bg-blue-700 transition-all text-lg shadow-lg shadow-blue-200 hover:shadow-xl hover:-translate-y-0.5 w-full lg:w-auto"
-                >
-                  Assinar agora
-                  <ArrowRight className="w-5 h-5" />
-                </a>
-                <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                  <Shield className="w-3.5 h-3.5 text-green-500" />
-                  Pagamento 100% seguro
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                  <p className="text-sm text-red-600">{error}</p>
                 </div>
+              )}
+
+              <button
+                onClick={handleCheckout}
+                disabled={loading}
+                className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white font-bold px-8 py-4 rounded-2xl hover:bg-blue-700 transition-all text-lg shadow-lg shadow-blue-200 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Aguarde...
+                  </>
+                ) : (
+                  <>
+                    Ir para o pagamento
+                    <ArrowRight className="w-5 h-5" />
+                  </>
+                )}
+              </button>
+
+              <div className="flex items-center justify-center gap-1.5 text-xs text-gray-500">
+                <Shield className="w-3.5 h-3.5 text-green-500" />
+                Pagamento 100% seguro via Mercado Pago
               </div>
             </div>
 
-            {/* Divisor */}
-            <hr className="border-t border-gray-100 my-8" />
+            <div className="border-t border-gray-100 my-6" />
 
             {/* Funcionalidades */}
             <div>
-              <p className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-5">
+              <p className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-5 text-center">
                 Tudo incluso no plano
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {[
-                  {
-                    title: "Calculadora Completa",
-                    desc: "Custo, frete, embalagem, impostos, maquininha e margem",
-                  },
-                  {
-                    title: "Taxa da Maquininha",
-                    desc: "Inclua a taxa no cálculo e não perca margem no pagamento",
-                  },
-                  {
-                    title: "Histórico Ilimitado",
-                    desc: "Salve, visualize e edite todos os seus cálculos",
-                  },
-                  {
-                    title: "Curva ABC",
-                    desc: "Classifique produtos por lucratividade com gráficos",
-                  },
-                  {
-                    title: "Relatórios e Gráficos",
-                    desc: "Evolução da margem, distribuição e top produtos",
-                  },
-                  {
-                    title: "Exportação de Dados",
-                    desc: "Exporte seus dados a qualquer momento (LGPD)",
-                  },
-                  {
-                    title: "Suporte via WhatsApp",
-                    desc: "Atendimento humano para dúvidas e suporte técnico",
-                  },
-                  {
-                    title: "Acesso em qualquer dispositivo",
-                    desc: "Web, celular ou tablet — funciona em todos",
-                  },
+                  { title: "Calculadora Completa", desc: "Custo, frete, embalagem, impostos, maquininha e margem" },
+                  { title: "Taxa da Maquininha", desc: "Inclua a taxa no cálculo e não perca margem" },
+                  { title: "Histórico Ilimitado", desc: "Salve, visualize e edite todos os seus cálculos" },
+                  { title: "Curva ABC", desc: "Classifique produtos por lucratividade com gráficos" },
+                  { title: "Relatórios e Gráficos", desc: "Evolução da margem e análise dos produtos" },
+                  { title: "Exportação de Dados", desc: "Exporte seus dados a qualquer momento" },
+                  { title: "Suporte via WhatsApp", desc: "Atendimento humano para dúvidas técnicas" },
+                  { title: "Acesso em qualquer dispositivo", desc: "Web, celular ou tablet" },
                 ].map((item) => (
                   <div key={item.title} className="flex items-start gap-3 bg-gray-50 rounded-xl p-3">
                     <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
@@ -151,49 +198,15 @@ export default function PlanosPage() {
                 ))}
               </div>
             </div>
-
-            {/* Divisor */}
-            <hr className="border-t border-gray-100 my-8" />
-
-            {/* CTA final */}
-            <div className="text-center">
-              <a
-                href={PAYMENT_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 bg-green-500 text-white font-bold px-10 py-4 rounded-2xl hover:bg-green-600 transition-all text-lg shadow-lg shadow-green-200 hover:shadow-xl hover:-translate-y-0.5"
-              >
-                Quero assinar por R$ 9,90/ano
-                <ArrowRight className="w-5 h-5" />
-              </a>
-              <p className="text-xs text-gray-400 mt-3">
-                Após o pagamento, você receberá as instruções de acesso por e-mail.
-              </p>
-            </div>
           </div>
         </div>
 
         {/* Garantias */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           {[
-            {
-              icon: Shield,
-              color: "text-green-600 bg-green-100",
-              title: "Pagamento Seguro",
-              desc: "Processado com criptografia SSL",
-            },
-            {
-              icon: MessageCircle,
-              color: "text-blue-600 bg-blue-100",
-              title: "Suporte WhatsApp",
-              desc: "Atendimento humano e rápido",
-            },
-            {
-              icon: Lock,
-              color: "text-purple-600 bg-purple-100",
-              title: "Dados Protegidos",
-              desc: "Em conformidade com a LGPD",
-            },
+            { icon: Shield, color: "text-green-600 bg-green-100", title: "Pagamento Seguro", desc: "Processado pelo Mercado Pago com SSL" },
+            { icon: MessageCircle, color: "text-blue-600 bg-blue-100", title: "Suporte WhatsApp", desc: "Atendimento humano e rápido" },
+            { icon: Lock, color: "text-purple-600 bg-purple-100", title: "Dados Protegidos", desc: "Em conformidade com a LGPD" },
           ].map((item) => (
             <div key={item.title} className="bg-white rounded-2xl border border-gray-100 p-5 text-center shadow-sm">
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-3 ${item.color}`}>
@@ -207,26 +220,24 @@ export default function PlanosPage() {
 
         {/* FAQ */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 lg:p-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-6 text-center">
-            Dúvidas frequentes
-          </h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-6 text-center">Dúvidas frequentes</h2>
           <div className="space-y-5">
             {[
               {
                 q: "Como recebo o acesso após o pagamento?",
-                a: "Após a confirmação do pagamento, você receberá um e-mail com as instruções de acesso em até 24 horas úteis.",
+                a: "Após a confirmação do pagamento pelo Mercado Pago, seu acesso é liberado automaticamente. Você receberá um e-mail de confirmação em minutos.",
               },
               {
-                q: "Como funciona o cancelamento?",
-                a: "Você possui o prazo de 7 dias úteis para solicitar o cancelamento pelo suporte via WhatsApp após a compra.",
+                q: "Preciso usar o mesmo e-mail do pagamento?",
+                a: "Sim! Use o mesmo e-mail aqui e no cadastro da plataforma. Nosso sistema identifica seu pagamento pelo e-mail.",
               },
               {
-                q: "Funciona no celular?",
-                a: "Sim! O PrecificaFácil é totalmente responsivo e funciona em qualquer dispositivo — computador, tablet ou celular.",
+                q: "Quais formas de pagamento são aceitas?",
+                a: "PIX (aprovação imediata), cartão de crédito e boleto bancário — tudo pelo Mercado Pago.",
               },
               {
                 q: "O valor vai aumentar?",
-                a: "Este é o preço de lançamento. Assinantes que entrarem agora mantêm o valor mesmo se o preço for reajustado no futuro.",
+                a: "Este é o preço de lançamento. Quem assinar agora mantém o valor mesmo se o preço for reajustado no futuro.",
               },
             ].map((item) => (
               <div key={item.q} className="border-b border-gray-100 pb-5 last:border-0 last:pb-0">
