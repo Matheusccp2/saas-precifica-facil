@@ -9,12 +9,18 @@ import {
   signOut,
   updateProfile,
   sendPasswordResetEmail,
-  deleteUser,
-  EmailAuthProvider,
-  reauthenticateWithCredential,
-  sendEmailVerification,
 } from "firebase/auth";
-import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
+import {
+  doc,
+  setDoc,
+  getDoc,
+  getDocs,
+  collection,
+  query,
+  where,
+  serverTimestamp,
+  updateDoc,
+} from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 
 export function useAuth() {
@@ -37,7 +43,12 @@ export function useAuth() {
   }, []);
 
   const login = async (email: string, password: string) => {
-    return signInWithEmailAndPassword(auth, email, password);
+    const cred = await signInWithEmailAndPassword(auth, email, password);
+
+    // Verifica se existe pagamento aprovado para este e-mail
+    await checkAndActivateByEmail(cred.user.uid, email);
+
+    return cred;
   };
 
   const register = async (
@@ -47,6 +58,8 @@ export function useAuth() {
   ) => {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(cred.user, { displayName });
+
+    // Cria o documento do usuário
     await setDoc(doc(db, "users", cred.user.uid), {
       uid: cred.user.uid,
       email,
@@ -57,32 +70,40 @@ export function useAuth() {
       updatedAt: serverTimestamp(),
     });
 
-    // Envia e-mail de verificação protegendo contra erros de disparo
-    try {
-      await sendEmailVerification(cred.user);
-    } catch (err) {
-      console.error("Erro ao enviar email de verificação:", err);
-      // Opcional: Aqui nós só fazemos log. O usuário já foi criado.
-    }
+    // Verifica se já existe pagamento aprovado para este e-mail
+    await checkAndActivateByEmail(cred.user.uid, email);
 
     return cred;
+  };
+
+  // Verifica na coleção payments se existe pagamento aprovado
+  // para o e-mail e ativa o usuário automaticamente
+  const checkAndActivateByEmail = async (uid: string, email: string) => {
+    try {
+      console.log("🔍 Verificando pagamento para:", email);
+
+      const res = await fetch("/api/activate-user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid, email }),
+      });
+
+      const data = await res.json();
+
+      if (data.activated) {
+        console.log("🎉 Usuário ativado com sucesso!");
+        setIsActive(true);
+      } else {
+        console.log("ℹ️ Sem pagamento encontrado:", data.reason);
+      }
+    } catch (error) {
+      console.error("❌ Erro ao verificar pagamento:", error);
+    }
   };
 
   const logout = () => signOut(auth);
 
   const resetPassword = (email: string) => sendPasswordResetEmail(auth, email);
-
-  // ── Reautentica e deleta conta completamente ──
-  const deleteAccount = async (password: string): Promise<void> => {
-    if (!user || !user.email) throw new Error("Usuário não autenticado.");
-
-    // Reautentica para garantir sessão recente
-    const credential = EmailAuthProvider.credential(user.email, password);
-    await reauthenticateWithCredential(user, credential);
-
-    // Deleta do Authentication
-    await deleteUser(user);
-  };
 
   return {
     user,
